@@ -78,30 +78,6 @@ impl InitSynProperty {
     }
 }
 
-impl<W> WCodec<&i8, &mut W> for Zenoh060
-where
-    W: Writer,
-{
-    type Output = Result<(), DidntWrite>;
-
-    fn write(self, writer: &mut W, x: &i8) -> Self::Output {
-        self.write(&mut *writer, &x.to_ne_bytes[0])?;
-        Ok(())
-    }
-}
-
-impl<R> RCodec<i8, &mut R> for Zenoh060
-where
-    R: Reader,
-{
-    type Error = DidntRead;
-
-    fn read(self, reader: &mut R) -> Result<i8, Self::Error> {
-        let le: u8 = self.read(&mut *reader)?;
-        Ok(i8::from_ne_bytes([le]))
-    }
-}
-
 /// The schedule for the pause period used by a node.
 /// It follows the crontab format.
 /// Field    Description    Allowed Value
@@ -116,6 +92,7 @@ where
 /// of every our on Monday and Wednesday its schedule will be
 /// minutes hours    dom      months    dow
 ///    15    -1    (-1,-1)   (-1,-1)  (0,2)
+#[derive(Clone)]
 struct Schedule {
     minutes: i8,
     hours: i8,
@@ -155,14 +132,14 @@ where
     type Output = Result<(), DidntWrite>;
 
     fn write(self, writer: &mut W, x: &Schedule) -> Self::Output {
-        self.write(&mut *writer, &x.minutes)?;
-        self.write(&mut *writer, &x.hours)?;
-        self.write(&mut *writer, &x.dom.0)?;
-        self.write(&mut *writer, &x.dom.1)?;
-        self.write(&mut *writer, &x.months.0)?;
-        self.write(&mut *writer, &x.months.1)?;
-        self.write(&mut *writer, &x.dow.0)?;
-        self.write(&mut *writer, &x.dow.1)?;
+        self.write(&mut *writer, x.minutes)?;
+        self.write(&mut *writer, x.hours)?;
+        self.write(&mut *writer, x.dom.0)?;
+        self.write(&mut *writer, x.dom.1)?;
+        self.write(&mut *writer, x.months.0)?;
+        self.write(&mut *writer, x.months.1)?;
+        self.write(&mut *writer, x.dow.0)?;
+        self.write(&mut *writer, x.dow.1)?;
 
         Ok(())
     }
@@ -270,14 +247,14 @@ where
         self.write(&mut *writer, x.version)?;
 
         if x.flags & S_FLAG == S_FLAG {
-            self.write(&mut *writer, &x.schedule.minutes)?;
-            self.write(&mut *writer, &x.schedule.hours)?;
-            self.write(&mut *writer, &x.schedule.dom.0)?;
-            self.write(&mut *writer, &x.schedule.dom.1)?;
-            self.write(&mut *writer, &x.schedule.months.0)?;
-            self.write(&mut *writer, &x.schedule.months.1)?;
-            self.write(&mut *writer, &x.schedule.dow.0)?;
-            self.write(&mut *writer, &x.schedule.dow.1)?;
+            self.write(&mut *writer, x.schedule.minutes)?;
+            self.write(&mut *writer, x.schedule.hours)?;
+            self.write(&mut *writer, x.schedule.dom.0)?;
+            self.write(&mut *writer, x.schedule.dom.1)?;
+            self.write(&mut *writer, x.schedule.months.0)?;
+            self.write(&mut *writer, x.schedule.months.1)?;
+            self.write(&mut *writer, x.schedule.dow.0)?;
+            self.write(&mut *writer, x.schedule.dow.1)?;
         }
 
         Ok(())
@@ -397,15 +374,13 @@ impl PeerAuthenticatorTrait for PauseCapability {
         link: &AuthenticatedPeerLink,
         _peer_id: &ZenohId,
     ) -> ZResult<Option<Vec<u8>>> {
-        let schedule = match self.schedule {
-            Some(s) => s,
-            None => Schedule::default(),
-        };
-
         let init_syn_property = InitSynProperty {
             flags: self.get_flags(),
             version: PAUSE_VERSION,
-            schedule,
+            schedule: match &self.schedule {
+                Some(s) => s.clone(),
+                None => Schedule::default(),
+            },
         };
         let mut buff = vec![];
         let codec = Zenoh060::default();

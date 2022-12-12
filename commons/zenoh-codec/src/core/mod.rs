@@ -63,6 +63,32 @@ where
     }
 }
 
+// i8
+
+impl<W> WCodec<i8, &mut W> for Zenoh060
+where
+    W: Writer,
+{
+    type Output = Result<(), DidntWrite>;
+
+    fn write(self, writer: &mut W, x: i8) -> Self::Output {
+        self.write(&mut *writer, &x.to_le_bytes()[0])?;
+        Ok(())
+    }
+}
+
+impl<R> RCodec<i8, &mut R> for Zenoh060
+where
+    R: Reader,
+{
+    type Error = DidntRead;
+
+    fn read(self, reader: &mut R) -> Result<i8, Self::Error> {
+        let le: u8 = self.read(&mut *reader)?;
+        Ok(i8::from_le_bytes([le]))
+    }
+}
+
 // &[u8] / Vec<u8>
 impl<W> WCodec<&[u8], &mut W> for Zenoh060
 where
