@@ -23,6 +23,7 @@ authors = [
 	"Olivier Hécart <olivier.hecart@zettascale.tech>",
 	"Luca Cominardi <luca.cominardi@zettascale.tech>",
 	"Pierre Avital <pierre.avital@zettascale.tech>",
+	"Gabriele Baldoni <gabriele.baldoni@zettascale.tech>"
 ]
 edition = "2018"
 license = " EPL-2.0 OR Apache-2.0"
@@ -39,6 +40,7 @@ shared-memory = [
 
 auth_pubkey = ["rsa"]
 auth_usrpwd = []
+pause_resume = []
 transport_quic = ["zenoh-link/transport_quic"]
 transport_tcp = ["zenoh-link/transport_tcp"]
 transport_tls = ["zenoh-link/transport_tls"]

@@ -101,6 +101,7 @@ pub mod tmsg {
         pub const MAX_SESSIONS: u8 = 0x03;
         pub const MAX_LINKS: u8 = 0x04;
         pub const EXPIRED: u8 = 0x05;
+        pub const PAUSE: u8 = 0x06;
     }
 
     pub fn close_reason_to_str(reason: u8) -> &'static str {
@@ -111,6 +112,7 @@ pub mod tmsg {
             close_reason::MAX_SESSIONS => "MAX_SESSIONS",
             close_reason::MAX_LINKS => "MAX_LINKS",
             close_reason::EXPIRED => "EXPIRED",
+            close_reason::PAUSE => "PAUSE",
             _ => "UNKNOWN",
         }
     }

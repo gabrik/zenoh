@@ -11,6 +11,8 @@
 // Contributors:
 //   ZettaScale Zenoh Team, <zenoh@zettascale.tech>
 //
+#[cfg(feature = "pause_resume")]
+mod pause;
 #[cfg(feature = "auth_pubkey")]
 mod pubkey;
 #[cfg(feature = "shared-memory")]
@@ -20,6 +22,8 @@ mod userpassword;
 
 use crate::unicast::establishment::Cookie;
 use async_trait::async_trait;
+#[cfg(feature = "pause_resume")]
+pub use pause::*;
 #[cfg(feature = "auth_pubkey")]
 pub use pubkey::*;
 #[cfg(feature = "shared-memory")]
@@ -127,6 +131,7 @@ pub enum PeerAuthenticatorId {
     Shm = 1,
     UserPassword = 2,
     PublicKey = 3,
+    Pause = 4,
 }
 
 impl From<PeerAuthenticatorId> for ZInt {
@@ -162,6 +167,13 @@ impl PeerAuthenticator {
         #[cfg(feature = "shared-memory")]
         {
             let mut res = SharedMemoryAuthenticator::from_config(_config).await?;
+            if let Some(pa) = res.take() {
+                pas.insert(pa.into());
+            }
+        }
+        #[cfg(feature = "pause_resume")]
+        {
+            let mut res = PauseCapability::from_config(_config).await?;
             if let Some(pa) = res.take() {
                 pas.insert(pa.into());
             }

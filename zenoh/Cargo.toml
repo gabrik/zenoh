@@ -37,6 +37,7 @@ maintenance = { status = "actively-developed" }
 [features]
 auth_pubkey = ["zenoh-transport/auth_pubkey"]
 auth_usrpwd = ["zenoh-transport/auth_usrpwd"]
+pause_resume = ["zenoh-transport/pause_resume"]
 complete_n = ["zenoh-protocol/complete_n"]
 shared-memory = [
     "zenoh-buffers/shared-memory",
@@ -61,6 +62,7 @@ default = [
     "transport_tls",
     "transport_udp",
     "transport_unixsock-stream",
+    "pause_resume",
 ]
 
 [dependencies]

@@ -28,7 +28,7 @@ use crate::core::ZenohId;
 ///
 ///  7 6 5 4 3 2 1 0
 /// +-+-+-+-+-+-+-+-+
-/// |X|K|I|  CLOSE  |
+/// |P|K|I|  CLOSE  |
 /// +-+-+-+-+-------+
 /// ~    peer_id    ~  if I==1 -- PID of the target peer.
 /// +---------------+
@@ -39,6 +39,7 @@ use crate::core::ZenohId;
 /// - if K==1 then close the transport link the CLOSE message was sent on (e.g., TCP socket) but
 ///           keep the whole transport open. NOTE: the transport will be automatically closed when
 ///           the transport's lease period expires.
+/// - if P==1
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Close {
