@@ -329,14 +329,12 @@ impl PauseCapability {
         // Need of Resume Ack
         // Eventual Schedule
 
-        // if *config.transport().pause().enabled() {
+        if *config.transport().pause().enabled() {
 
-        //     Ok(Some(Self::default()))
-        // } else {
-        //     Ok(None)
-        // }
-
-        Ok(Some(Self::default()))
+            Ok(Some(Self::default()))
+        } else {
+            Ok(None)
+        }z
     }
 
     fn get_flags(&self) -> u8 {
